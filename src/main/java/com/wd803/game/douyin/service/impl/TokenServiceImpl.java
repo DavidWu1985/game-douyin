@@ -2,13 +2,8 @@ package com.wd803.game.douyin.service.impl;
 
 import com.wd803.game.douyin.entity.TokenEntity;
 import com.wd803.game.douyin.service.TokenService;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
