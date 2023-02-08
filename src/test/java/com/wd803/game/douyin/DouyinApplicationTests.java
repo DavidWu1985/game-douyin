@@ -25,7 +25,7 @@ class DouyinApplicationTests {
 
     @Test
     void gameStart(){
-        System.out.println(gameService.gameStart());
+        System.out.println(gameService.gameStart("roomid", "msg_type"));
     }
 
 }
