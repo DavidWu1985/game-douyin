@@ -13,8 +13,7 @@ public class SignatureUtils {
      * @param payLoad
      * @return
      */
-    public static String signature(Map<String, String> headers, String payLoad) {
-        String secret = "abcd";
+    public static String signature(Map<String, String> headers, String payLoad, String secret) {
         List<String> keyList = new ArrayList();
         headers.forEach((key, val) -> keyList.add(key));
         Collections.sort(keyList, String::compareTo);

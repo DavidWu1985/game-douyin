@@ -44,10 +44,22 @@ class DouyinApplicationTests {
                 map.put("x-timestamp","99999time");
                 map.put("x-roomid","room803");
                 map.put("x-msg-type","live_like");
-                String s = SignatureUtils.signature(map, "abc123hello");
+                String s = SignatureUtils.signature(map, "abc123hello", "1234");
                 System.out.println(s);
             });
         }
+    }
+
+
+    @Test
+    void testReceiveMsg(){
+        Map<String, String> map = new HashMap<>();
+        map.put("x-nonce-str","7654321nonce");
+        map.put("x-timestamp","99999time");
+        map.put("x-roomid","room803");
+        map.put("x-msg-type","live_comment");
+        String payLoad = "[{\"msg_id\":\"123456783\",\"sec_openid\":\"xxxx\",\"like_num\":\"22\",\"avatar_url\":\"xxx\",\"nickname\":\"xxxx\",\"timestamp\":1649068964},{\"msg_id\":\"123456784\",\"sec_openid\":\"xxxx\",\"like_num\":\"22\",\"avatar_url\":\"xxx\",\"nickname\":\"xxxx\",\"timestamp\":1649068964},{\"msg_id\":\"123456785\",\"sec_openid\":\"xxxx\",\"like_num\":\"22\",\"avatar_url\":\"xxx\",\"nickname\":\"xxxx\",\"timestamp\":1649068964},{\"msg_id\":\"123456786\",\"sec_openid\":\"xxxx\",\"like_num\":\"22\",\"avatar_url\":\"xxx\",\"nickname\":\"xxxx\",\"timestamp\":1649068964},{\"msg_id\":\"123456783\",\"sec_openid\":\"xxxx\",\"like_num\":\"22\",\"avatar_url\":\"xxx\",\"nickname\":\"xxxx\",\"timestamp\":1649068964}]";
+        System.out.println(gameService.receivePushedMsg(map, payLoad, "comment"));
     }
 
 }

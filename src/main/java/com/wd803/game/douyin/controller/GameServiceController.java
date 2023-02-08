@@ -42,9 +42,18 @@ public class GameServiceController {
     }
 
 
-    @PostMapping("msg-receive")
-    public BaseEntity receivePushedMsg(@RequestHeader Map<String,String> headers, @RequestBody String payLoad){
-        return null;
+    @PostMapping("msg-receive/comment")
+    public String receivePushedMsgComment(@RequestHeader Map<String,String> headers, @RequestBody String payLoad){
+        return gameService.receivePushedMsg(headers, payLoad, "comment");
+    }
+
+    @PostMapping("msg-receive/like")
+    public String receivePushedMsgLike(@RequestHeader Map<String,String> headers, @RequestBody String payLoad){
+        return gameService.receivePushedMsg(headers, payLoad, "like");
+    }
+    @PostMapping("msg-receive/gift")
+    public String receivePushedMsgGift(@RequestHeader Map<String,String> headers, @RequestBody String payLoad){
+        return gameService.receivePushedMsg(headers, payLoad, "gift");
     }
 
 
