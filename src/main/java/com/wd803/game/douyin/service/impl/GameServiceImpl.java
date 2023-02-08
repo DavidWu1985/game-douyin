@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,12 +98,12 @@ public class GameServiceImpl implements GameService {
         //签名校验通过
         //解析消息体
         JSONArray list = JSONArray.parse(payLoad);
-        String x_msg_type = headers.get("x-msg-type");
+//        String x_msg_type = headers.get("x-msg-type");
         String roomid = headers.get("x-roomid");
         //一种类型的消息放在同一个room的消息类型下
-        String msgKey = roomid + ":" + x_msg_type;
+        String msgKey = roomid + ":" + msg_type;
         //消息ID放在set中，防止重复
-        String msgIdKey = roomid + ":" + x_msg_type + ":ids";
+        String msgIdKey = roomid + ":" + msg_type + ":ids";
         list.forEach(obj->{
             String msgId = ((JSONObject)obj).get("msg_id").toString();
             //判断消息体的ID是否在集合中
@@ -113,6 +114,28 @@ public class GameServiceImpl implements GameService {
         });
         return "succ";
     }
+
+    @Override
+    public BaseEntity getMsg(String roomid) {
+        String commentMsgKey = roomid + ":comment";
+        String commentMsgIdKey =  roomid + ":comment" + ":ids";
+        List comments = Arrays.asList(redisTemplate.opsForSet().members(commentMsgKey).toArray());
+        String likeMsgKey = roomid + ":like";
+        String likeMsgIdKey =  roomid + ":like" + ":ids";
+        List likes = Arrays.asList(redisTemplate.opsForSet().members(likeMsgKey).toArray());
+        String giftMsgKey = roomid + ":gift";
+        String giftMsgIdKey =  roomid + ":gift" + ":ids";
+        List gifts = Arrays.asList(redisTemplate.opsForSet().members(giftMsgKey).toArray());
+        Map<String, List> map = new HashMap<>();
+        map.put("comment", comments);
+        map.put("like", likes);
+        map.put("gift", gifts);
+        BaseEntity entity = new BaseEntity();
+        entity.setErr_no(0);
+        entity.setData(map);
+        return entity;
+    }
+
 
     @Override
     public BaseEntity checkTaskStatus(String roomid, String msg_type) {
@@ -128,7 +151,7 @@ public class GameServiceImpl implements GameService {
         headers.add("content-type", "application/json");
         Map<String, String> bodyMap = new HashMap<>();
         bodyMap.put("roomid", roomid);
-        bodyMap.put("appid", "ttd616a0ab492900b510");
+        bodyMap.put("appid", appid);
         bodyMap.put("msg_type", msg_type);
         HttpEntity<String> requestEntity = new HttpEntity<>(JSONObject.toJSONString(bodyMap), headers);
         ResponseEntity<BaseEntity> result = restTemplate.postForEntity(url, requestEntity, BaseEntity.class);

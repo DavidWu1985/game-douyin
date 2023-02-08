@@ -42,18 +42,44 @@ public class GameServiceController {
     }
 
 
+    /**
+     * 接收评论消息接口
+     * @param headers
+     * @param payLoad
+     * @return
+     */
     @PostMapping("msg-receive/comment")
     public String receivePushedMsgComment(@RequestHeader Map<String,String> headers, @RequestBody String payLoad){
         return gameService.receivePushedMsg(headers, payLoad, "comment");
     }
 
+    /**
+     * 接收点赞消息接口
+     * @param headers
+     * @param payLoad
+     * @return
+     */
     @PostMapping("msg-receive/like")
     public String receivePushedMsgLike(@RequestHeader Map<String,String> headers, @RequestBody String payLoad){
         return gameService.receivePushedMsg(headers, payLoad, "like");
     }
+
+    /**
+     * 接收礼物消息接口
+     * @param headers
+     * @param payLoad
+     * @return
+     */
     @PostMapping("msg-receive/gift")
     public String receivePushedMsgGift(@RequestHeader Map<String,String> headers, @RequestBody String payLoad){
         return gameService.receivePushedMsg(headers, payLoad, "gift");
+    }
+
+
+    @GetMapping("/msg")
+    public BaseEntity getMsg(@RequestParam("roomid") String roomid){
+        return gameService.getMsg(roomid);
+
     }
 
 

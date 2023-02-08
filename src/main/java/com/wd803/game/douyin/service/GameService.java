@@ -13,4 +13,6 @@ public interface GameService {
     BaseEntity checkTaskStatus(String roomid, String msg_type);
 
     String receivePushedMsg(Map<String, String> headers, String payLoad, String msg_type);
+
+    BaseEntity getMsg(String roomid);
 }
