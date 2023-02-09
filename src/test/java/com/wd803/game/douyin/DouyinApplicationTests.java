@@ -59,7 +59,7 @@ class DouyinApplicationTests {
         map.put("x-roomid","room803");
         map.put("x-msg-type","live_comment");
         String payLoad = "[{\"msg_id\":\"123456783\",\"sec_openid\":\"xxxx\",\"like_num\":\"22\",\"avatar_url\":\"xxx\",\"nickname\":\"xxxx\",\"timestamp\":1649068964},{\"msg_id\":\"123456784\",\"sec_openid\":\"xxxx\",\"like_num\":\"22\",\"avatar_url\":\"xxx\",\"nickname\":\"xxxx\",\"timestamp\":1649068964},{\"msg_id\":\"123456785\",\"sec_openid\":\"xxxx\",\"like_num\":\"22\",\"avatar_url\":\"xxx\",\"nickname\":\"xxxx\",\"timestamp\":1649068964},{\"msg_id\":\"123456786\",\"sec_openid\":\"xxxx\",\"like_num\":\"22\",\"avatar_url\":\"xxx\",\"nickname\":\"xxxx\",\"timestamp\":1649068964},{\"msg_id\":\"123456783\",\"sec_openid\":\"xxxx\",\"like_num\":\"22\",\"avatar_url\":\"xxx\",\"nickname\":\"xxxx\",\"timestamp\":1649068964}]";
-        System.out.println(gameService.receivePushedMsg(map, payLoad, "like"));
+        System.out.println(gameService.receivePushedMsg(map, payLoad, "comments"));
     }
 
     @Test

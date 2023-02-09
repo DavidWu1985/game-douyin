@@ -2,6 +2,7 @@ package com.wd803.game.douyin.controller;
 
 
 import com.wd803.game.douyin.entity.BaseEntity;
+import com.wd803.game.douyin.entity.MsgTypeEnum;
 import com.wd803.game.douyin.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -50,7 +51,7 @@ public class GameServiceController {
      */
     @PostMapping("msg-receive/comment")
     public String receivePushedMsgComment(@RequestHeader Map<String,String> headers, @RequestBody String payLoad){
-        return gameService.receivePushedMsg(headers, payLoad, "comment");
+        return gameService.receivePushedMsg(headers, payLoad, MsgTypeEnum.COMMENT.getType());
     }
 
     /**
@@ -61,7 +62,7 @@ public class GameServiceController {
      */
     @PostMapping("msg-receive/like")
     public String receivePushedMsgLike(@RequestHeader Map<String,String> headers, @RequestBody String payLoad){
-        return gameService.receivePushedMsg(headers, payLoad, "like");
+        return gameService.receivePushedMsg(headers, payLoad, MsgTypeEnum.LIKE.getType());
     }
 
     /**
@@ -72,14 +73,18 @@ public class GameServiceController {
      */
     @PostMapping("msg-receive/gift")
     public String receivePushedMsgGift(@RequestHeader Map<String,String> headers, @RequestBody String payLoad){
-        return gameService.receivePushedMsg(headers, payLoad, "gift");
+        return gameService.receivePushedMsg(headers, payLoad, MsgTypeEnum.GIFT.getType());
     }
 
 
+    /**
+     * 手机获取消息接口
+     * @param roomid
+     * @return
+     */
     @GetMapping("/msg")
     public BaseEntity getMsg(@RequestParam("roomid") String roomid){
         return gameService.getMsg(roomid);
-
     }
 
 

@@ -3,10 +3,9 @@ package com.wd803.game.douyin.service.impl;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.wd803.game.douyin.entity.BaseEntity;
+import com.wd803.game.douyin.entity.MsgTypeEnum;
 import com.wd803.game.douyin.service.GameService;
 import com.wd803.game.douyin.service.TokenService;
-import com.wd803.game.douyin.util.SignatureUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
@@ -15,10 +14,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 public class GameServiceImpl implements GameService {
@@ -39,36 +38,12 @@ public class GameServiceImpl implements GameService {
     public BaseEntity gameStart(String roomid, String msg_type) {
 
         String url = "https://webcast.bytedance.com/api/live_data/task/start";
-//        RestTemplate restTemplate = new RestTemplate();
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.add("access-token", tokenService.getToken());
-//        headers.add("content-type", "application/json");
-//        Map<String, String> bodyMap = new HashMap<>();
-//        bodyMap.put("roomid", roomid);
-//        bodyMap.put("appid", "ttd616a0ab492900b510");
-//        bodyMap.put("msg_type", msg_type);
-//        System.out.println(JSONObject.toJSONString(bodyMap));
-//        HttpEntity<String> requestEntity = new HttpEntity<>(JSONObject.toJSONString(bodyMap), headers);
-//        ResponseEntity<BaseEntity> result = restTemplate.postForEntity(url, requestEntity, BaseEntity.class);
-//        System.out.println(JSONObject.toJSONString(result.getBody()));
         return pushMsgToDouyin(url, roomid, msg_type);
     }
 
     @Override
     public BaseEntity gameEnd(String roomid, String msg_type) {
         String url = "https://webcast.bytedance.com/api/live_data/task/stop";
-//        RestTemplate restTemplate = new RestTemplate();
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.add("access-token", tokenService.getToken());
-//        headers.add("content-type", "application/json");
-//        Map<String, String> bodyMap = new HashMap<>();
-//        bodyMap.put("roomid", roomid);
-//        bodyMap.put("appid", "ttd616a0ab492900b510");
-//        bodyMap.put("msg_type", msg_type);
-//        System.out.println(JSONObject.toJSONString(bodyMap));
-//        HttpEntity<String> requestEntity = new HttpEntity<>(JSONObject.toJSONString(bodyMap), headers);
-//        ResponseEntity<BaseEntity> result = restTemplate.postForEntity(url, requestEntity, BaseEntity.class);
-//        System.out.println(JSONObject.toJSONString(result.getBody()));
         return pushMsgToDouyin(url, roomid, msg_type);
     }
 
@@ -80,7 +55,6 @@ public class GameServiceImpl implements GameService {
         map.put("x-roomid", headers.get("x-roomid"));
         map.put("x-msg-type", headers.get("x-msg-type"));
 //        String signature = null;
-//
 //        switch (msg_type) {
 //            case "comment":
 //                signature = SignatureUtils.signature(map, payLoad, commentSecret);
@@ -98,16 +72,15 @@ public class GameServiceImpl implements GameService {
         //签名校验通过
         //解析消息体
         JSONArray list = JSONArray.parse(payLoad);
-//        String x_msg_type = headers.get("x-msg-type");
         String roomid = headers.get("x-roomid");
         //一种类型的消息放在同一个room的消息类型下
         String msgKey = roomid + ":" + msg_type;
         //消息ID放在set中，防止重复
         String msgIdKey = roomid + ":" + msg_type + ":ids";
-        list.forEach(obj->{
-            String msgId = ((JSONObject)obj).get("msg_id").toString();
+        list.forEach(obj -> {
+            String msgId = ((JSONObject) obj).get("msg_id").toString();
             //判断消息体的ID是否在集合中
-            if (!redisTemplate.opsForSet().members(msgIdKey).contains(msgId)) {
+            if (!redisTemplate.opsForSet().isMember(msgIdKey, msgId)) {
                 redisTemplate.opsForSet().add(msgKey, obj);
                 redisTemplate.opsForSet().add(msgIdKey, msgId);
             }
@@ -117,22 +90,35 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public BaseEntity getMsg(String roomid) {
-        String commentMsgKey = roomid + ":comment";
-        String commentMsgIdKey =  roomid + ":comment" + ":ids";
-        List comments = Arrays.asList(redisTemplate.opsForSet().members(commentMsgKey).toArray());
-        String likeMsgKey = roomid + ":like";
-        String likeMsgIdKey =  roomid + ":like" + ":ids";
-        List likes = Arrays.asList(redisTemplate.opsForSet().members(likeMsgKey).toArray());
-        String giftMsgKey = roomid + ":gift";
-        String giftMsgIdKey =  roomid + ":gift" + ":ids";
-        List gifts = Arrays.asList(redisTemplate.opsForSet().members(giftMsgKey).toArray());
-        Map<String, List> map = new HashMap<>();
-        map.put("comment", comments);
-        map.put("like", likes);
-        map.put("gift", gifts);
+        String commentMsgKey = roomid + ":" + MsgTypeEnum.COMMENT.getType();
+        Set comments = redisTemplate.opsForSet().members(commentMsgKey);
+        String likeMsgKey = roomid + ":" + MsgTypeEnum.LIKE.getType();
+        Set likes = redisTemplate.opsForSet().members(likeMsgKey);
+        String giftMsgKey = roomid + ":" + MsgTypeEnum.GIFT.getType();
+        Set gifts = redisTemplate.opsForSet().members(giftMsgKey);
+        Map<String, Set<JSONObject>> map = new HashMap<>();
+        map.put("comments", comments.isEmpty() ? new HashSet<>() : comments);
+        map.put("like", likes.isEmpty() ? new HashSet<>() : likes);
+        map.put("gifts", gifts.isEmpty() ? new HashSet<>() : gifts);
         BaseEntity entity = new BaseEntity();
         entity.setErr_no(0);
+        entity.setErr_msg("succ");
         entity.setData(map);
+        if (redisTemplate.opsForSet().size(commentMsgKey) > 0) {
+            comments.forEach(msg -> {
+                redisTemplate.opsForSet().remove(commentMsgKey, msg);
+            });
+        }
+        if (redisTemplate.opsForSet().size(likeMsgKey) > 0) {
+            likes.forEach(msg -> {
+                redisTemplate.opsForSet().remove(likeMsgKey, msg);
+            });
+        }
+        if (redisTemplate.opsForSet().size(giftMsgKey) > 0) {
+            gifts.forEach(msg -> {
+                redisTemplate.opsForSet().remove(giftMsgKey, msg);
+            });
+        }
         return entity;
     }
 
