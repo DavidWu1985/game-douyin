@@ -35,6 +35,11 @@ class DouyinApplicationTests {
     }
 
     @Test
+    void gameEnd(){
+        System.out.println(gameService.gameEnd("roomid", "msg_type"));
+    }
+
+    @Test
     void testSignature(){
         ExecutorService executor = Executors.newCachedThreadPool();
         for(int i = 0; i < 1; i++){
