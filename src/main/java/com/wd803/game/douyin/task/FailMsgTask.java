@@ -32,7 +32,7 @@ public class FailMsgTask {
     /**
      * 获取失败信息，每秒执行一次
      */
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 1000)
     public void getMsgFormDouyin() {
         //查找要获取消息的房间号
         List<String> taskeys = new ArrayList<>(redisTemplate.keys(MsgTypeConstant.TASK_REDIS_KEY + "*"));

@@ -1,5 +1,6 @@
 package com.wd803.game.douyin.service.impl;
 
+import com.wd803.game.douyin.entity.MsgTypeConstant;
 import com.wd803.game.douyin.entity.TokenEntity;
 import com.wd803.game.douyin.service.TokenService;
 import lombok.extern.slf4j.Slf4j;
@@ -25,15 +26,15 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public String getToken() {
-        String tokenKey = TOKEN_KEY + "ttd616a0ab492900b510";
+        String tokenKey = TOKEN_KEY + MsgTypeConstant.APP_ID;
         //此处要加分布式锁
         String token = (String) redisTemplate.opsForValue().get(tokenKey);
         if (StringUtils.isBlank(token)) {
             RestTemplate rest = new RestTemplate();
             String url = "https://developer.toutiao.com/api/apps/v2/token";
             Map<String, String> map = new HashMap<>();
-            map.put("appid", "ttd616a0ab492900b510");
-            map.put("secret", "8e2d8208fbc3feb0e70d0b19a3f08509b25491a7");
+            map.put("appid", MsgTypeConstant.APP_ID);
+            map.put("secret", MsgTypeConstant.SECRET);
             map.put("grant_type", "client_credential");
             ResponseEntity<TokenEntity> response = rest.postForEntity(url, map, TokenEntity.class);
             log.info(response.getBody().toString());

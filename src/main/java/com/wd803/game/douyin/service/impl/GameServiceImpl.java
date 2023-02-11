@@ -2,7 +2,6 @@ package com.wd803.game.douyin.service.impl;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.wd803.game.douyin.TaskThread;
 import com.wd803.game.douyin.entity.BaseEntity;
 import com.wd803.game.douyin.entity.MsgTypeConstant;
 import com.wd803.game.douyin.entity.TaskInfo;
@@ -25,8 +24,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+
+import static com.wd803.game.douyin.entity.MsgTypeConstant.*;
 
 @Slf4j
 @Service
@@ -35,15 +34,8 @@ public class GameServiceImpl implements GameService {
     @Autowired
     private TokenService tokenService;
 
-    private static String appid = "ttd616a0ab492900b510";
-
     @Autowired
     private RedisTemplate redisTemplate;
-
-    private static String commentSecret = "iMZXsaKrXGKbRzrHWATshPhmZarpdTAP";
-    private static String giftSecret = "FadBeREMKQSMQZjCbymcGExexnzDWmwQ";
-    private static String likeSecret = "NxfHwwYhYCehAHzfSbCezJxSTNEjBJCp";
-
 
     @Override
     public BaseEntity gameStart(String roomid, String msg_type) {
@@ -172,7 +164,7 @@ public class GameServiceImpl implements GameService {
         headers.add("content-type", "application/json");
         Map<String, String> bodyMap = new HashMap<>();
         bodyMap.put("roomid", roomid);
-        bodyMap.put("appid", appid);
+        bodyMap.put("appid", MsgTypeConstant.APP_ID);
         bodyMap.put("msg_type", msg_type);
         HttpEntity<String> requestEntity = new HttpEntity<>(JSONObject.toJSONString(bodyMap), headers);
         ResponseEntity<BaseEntity> result = restTemplate.postForEntity(url, requestEntity, BaseEntity.class);
@@ -244,7 +236,7 @@ public class GameServiceImpl implements GameService {
                                             int page_num, int page_size) {
 //        String url = "http://localhost:8080/game-service/failMsg";
         String url = "https://webcast.bytedance.com/api/live_data/task/fail_data/get?" +
-                "roomid=" + roomid + "&appid=" + appid + "&msg_type=" + msg_type +
+                "roomid=" + roomid + "&appid=" + MsgTypeConstant.APP_ID + "&msg_type=" + msg_type +
                 "&page_num=" + page_num + "&page_size=" + page_size;
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();

@@ -19,5 +19,4 @@ public interface GameService {
 
     void getFailMsgFromDouyin(TaskInfo task);
 
-//    void execGetMsg(TaskInfo task);
 }

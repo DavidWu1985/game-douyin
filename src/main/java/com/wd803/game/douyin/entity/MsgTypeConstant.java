@@ -5,15 +5,12 @@ public interface MsgTypeConstant {
     String LIKE = "live_like";
     String GIFT = "live_gift";
 
+    String TASK_REDIS_KEY = "tasks:";
 
-    String TASK_REDIS_KEY ="tasks:";
-//    String type;
-//
-//    MsgTypeConstant(String type) {
-//        this.type = type;
-//    }
-//
-//    public String getType() {
-//        return type;
-//    }
+    String APP_ID = "ttd616a0ab492900b510";
+    String SECRET = "8e2d8208fbc3feb0e70d0b19a3f08509b25491a7";
+
+    String commentSecret = "iMZXsaKrXGKbRzrHWATshPhmZarpdTAP";
+    String giftSecret = "FadBeREMKQSMQZjCbymcGExexnzDWmwQ";
+    String likeSecret = "NxfHwwYhYCehAHzfSbCezJxSTNEjBJCp";
 }
