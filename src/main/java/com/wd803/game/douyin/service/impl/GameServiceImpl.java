@@ -43,7 +43,9 @@ public class GameServiceImpl implements GameService {
         TaskInfo task = new TaskInfo();
         task.setRoomid(roomid);
         BaseEntity baseEntity = pushMsgToDouyin(url, roomid, msg_type);
-        redisTemplate.opsForValue().set(MsgTypeConstant.TASK_REDIS_KEY + roomid, task);
+        if (redisTemplate.opsForValue().get(MsgTypeConstant.TASK_REDIS_KEY + roomid) == null) {
+            redisTemplate.opsForValue().set(MsgTypeConstant.TASK_REDIS_KEY + roomid, task);
+        }
         return baseEntity;
     }
 
@@ -222,12 +224,15 @@ public class GameServiceImpl implements GameService {
                 } else {
                     log.info("获取失败消失出错，消息体为[{}]", failMsg);
                     run = false;
+                    task.setStarted("0");
+                    //方法出错，立即修改任务状态，把当前新状态的任务(任务状态和pageNum)放回任务队列
+                    redisTemplate.opsForValue().set(MsgTypeConstant.TASK_REDIS_KEY + task.getRoomid(), task);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
             task.setStarted("0");
-            //方法出错，立即修改任务状态，删除redis中的任务，把当前新状态的任务(任务状态和pageNum)放回任务队列
+            //方法出错，立即修改任务状态，把当前新状态的任务(任务状态和pageNum)放回任务队列
             redisTemplate.opsForValue().set(MsgTypeConstant.TASK_REDIS_KEY + task.getRoomid(), task);
         }
     }
