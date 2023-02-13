@@ -1,4 +1,4 @@
-package com.wd803.game.douyin;
+package com.wd803.game.douyin.task;
 
 import com.wd803.game.douyin.entity.TaskInfo;
 import com.wd803.game.douyin.service.GameService;

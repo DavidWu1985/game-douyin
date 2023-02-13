@@ -1,7 +1,6 @@
 package com.wd803.game.douyin.task;
 
 
-import com.wd803.game.douyin.TaskThread;
 import com.wd803.game.douyin.entity.MsgTypeConstant;
 import com.wd803.game.douyin.entity.TaskInfo;
 import com.wd803.game.douyin.service.GameService;
