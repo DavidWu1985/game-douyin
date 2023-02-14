@@ -147,7 +147,8 @@ public class GameServiceImpl implements GameService {
     @Override
     public BaseEntity checkTaskStatus(String roomid, String msg_type) {
         String url = "https://webcast.bytedance.com/api/live_data/task/get";
-        BaseEntity entity = pushMsgToDouyin(url, roomid, msg_type);
+        BaseEntity entity = getMsgFromDouyin(url, roomid, msg_type);
+        log.info("查询任务{}状态，结果:{}", roomid, entity);
         if (entity.getErr_no() == 0) {
             int status = (int) ((Map) entity.getData()).get("status");
             if (status == 1) { //1表示任务不存在
@@ -170,6 +171,19 @@ public class GameServiceImpl implements GameService {
         bodyMap.put("msg_type", msg_type);
         HttpEntity<String> requestEntity = new HttpEntity<>(JSONObject.toJSONString(bodyMap), headers);
         ResponseEntity<BaseEntity> result = restTemplate.postForEntity(url, requestEntity, BaseEntity.class);
+        return result.getBody();
+    }
+
+    private BaseEntity getMsgFromDouyin(String url, String roomid, String msg_type) {
+//        String url = "http://localhost:8080/game-service/failMsg";
+        url = url + "?roomid=" + roomid + "&appid=" + MsgTypeConstant.APP_ID + "&msg_type=" + msg_type;
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("access-token", tokenService.getToken());
+        headers.add("content-type", "application/json");
+        HttpEntity<MultiValueMap<String, Object>> requestbody = new HttpEntity<>(headers);
+        ResponseEntity<BaseEntity> result = restTemplate.exchange(url, HttpMethod.GET, requestbody, BaseEntity.class);
+        log.info("查询消息返回结果：{}", result);
         return result.getBody();
     }
 
