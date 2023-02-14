@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/game-service/*")
+@RequestMapping("/gameservice/*")
 public class GameServiceController {
 
     @Autowired
@@ -54,7 +54,7 @@ public class GameServiceController {
      * @param payLoad
      * @return
      */
-    @PostMapping("msg-receive/comment")
+    @PostMapping("msgreceive/comment")
     public String receivePushedMsgComment(@RequestHeader Map<String,String> headers, @RequestBody String payLoad){
         return gameService.receivePushedMsg(headers, payLoad, MsgTypeConstant.COMMENT);
     }
@@ -65,7 +65,7 @@ public class GameServiceController {
      * @param payLoad
      * @return
      */
-    @PostMapping("msg-receive/like")
+    @PostMapping("msgreceive/like")
     public String receivePushedMsgLike(@RequestHeader Map<String,String> headers, @RequestBody String payLoad){
         return gameService.receivePushedMsg(headers, payLoad, MsgTypeConstant.LIKE);
     }
@@ -76,7 +76,7 @@ public class GameServiceController {
      * @param payLoad
      * @return
      */
-    @PostMapping("msg-receive/gift")
+    @PostMapping("msgreceive/gift")
     public String receivePushedMsgGift(@RequestHeader Map<String,String> headers, @RequestBody String payLoad){
         return gameService.receivePushedMsg(headers, payLoad, MsgTypeConstant.GIFT);
     }
