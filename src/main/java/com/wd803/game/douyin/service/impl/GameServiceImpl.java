@@ -16,6 +16,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -38,7 +39,8 @@ public class GameServiceImpl implements GameService {
     private RedisTemplate redisTemplate;
 
     @Override
-    public BaseEntity gameStart(String roomid, String msg_type) {
+    @Retryable(value = {Exception.class}, maxAttempts = 2)
+    public BaseEntity gameStart(String roomid, String msg_type) throws Exception {
         String url = "https://webcast.bytedance.com/api/live_data/task/start";
         TaskInfo task = new TaskInfo();
         task.setRoomid(roomid);
@@ -50,7 +52,8 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public BaseEntity gameEnd(String roomid, String msg_type) {
+    @Retryable(value = {Exception.class}, maxAttempts = 2)
+    public BaseEntity gameEnd(String roomid, String msg_type) throws Exception {
         String url = "https://webcast.bytedance.com/api/live_data/task/stop";
         BaseEntity baseEntity = pushMsgToDouyin(url, roomid, msg_type);
         //房间关闭
@@ -147,7 +150,12 @@ public class GameServiceImpl implements GameService {
     @Override
     public BaseEntity checkTaskStatus(String roomid, String msg_type) {
         String url = "https://webcast.bytedance.com/api/live_data/task/get";
-        BaseEntity entity = getMsgFromDouyin(url, roomid, msg_type);
+        BaseEntity entity = null;
+        try {
+            entity = getMsgFromDouyin(url, roomid, msg_type);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         log.info("查询任务{}状态，结果:{}", roomid, entity);
         if (entity.getErr_no() == 0) {
             int status = (int) ((Map) entity.getData()).get("status");
@@ -160,7 +168,7 @@ public class GameServiceImpl implements GameService {
     }
 
 
-    public BaseEntity pushMsgToDouyin(String url, String roomid, String msg_type) {
+    public BaseEntity pushMsgToDouyin(String url, String roomid, String msg_type) throws Exception {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.add("access-token", tokenService.getToken());
@@ -171,10 +179,13 @@ public class GameServiceImpl implements GameService {
         bodyMap.put("msg_type", msg_type);
         HttpEntity<String> requestEntity = new HttpEntity<>(JSONObject.toJSONString(bodyMap), headers);
         ResponseEntity<BaseEntity> result = restTemplate.postForEntity(url, requestEntity, BaseEntity.class);
-        return result.getBody();
+        log.info("调用{}接口返回结果：{}", url, result.getBody());
+        BaseEntity entity = result.getBody();
+        refreshToken(entity);
+        return entity;
     }
 
-    private BaseEntity getMsgFromDouyin(String url, String roomid, String msg_type) {
+    private BaseEntity getMsgFromDouyin(String url, String roomid, String msg_type) throws Exception {
 //        String url = "http://localhost:8080/game-service/failMsg";
         url = url + "?roomid=" + roomid + "&appid=" + MsgTypeConstant.APP_ID + "&msg_type=" + msg_type;
         RestTemplate restTemplate = new RestTemplate();
@@ -183,8 +194,17 @@ public class GameServiceImpl implements GameService {
         headers.add("content-type", "application/json");
         HttpEntity<MultiValueMap<String, Object>> requestbody = new HttpEntity<>(headers);
         ResponseEntity<BaseEntity> result = restTemplate.exchange(url, HttpMethod.GET, requestbody, BaseEntity.class);
-        log.info("查询消息返回结果：{}", result);
-        return result.getBody();
+        log.info("调用{}接口返回结果：{}", url, result.getBody());
+        BaseEntity entity = result.getBody();
+        refreshToken(entity);
+        return entity;
+    }
+
+    private void refreshToken(BaseEntity entity) throws Exception {
+        if (entity != null && entity.getErr_no() == 1 && StringUtils.contains(entity.getErr_msg(), "status=40022")) {
+            tokenService.refreshToken();
+            throw new Exception("token过期,请再次执行刚才的操作");
+        }
     }
 
     @Override
@@ -263,7 +283,7 @@ public class GameServiceImpl implements GameService {
         headers.add("content-type", "application/json");
         HttpEntity<MultiValueMap<String, Object>> requestbody = new HttpEntity<>(headers);
         ResponseEntity<BaseEntity> result = restTemplate.exchange(url, HttpMethod.GET, requestbody, BaseEntity.class);
-        log.info("查询消息返回结果：{}", result);
+        log.info("查询失败消息返回结果：{}", result);
         return result.getBody();
     }
 

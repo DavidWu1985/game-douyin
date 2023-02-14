@@ -23,19 +23,34 @@ public class GameServiceController {
 
     /**
      * 游戏启动
+     *
      * @return
      */
     @GetMapping("start")
-    public BaseEntity gameStart(@RequestParam("roomid") String roomid, @RequestParam String msg_type){
-        return gameService.gameStart(roomid, msg_type);
+    public BaseEntity gameStart(@RequestParam("roomid") String roomid, @RequestParam String msg_type) {
+        try {
+            return gameService.gameStart(roomid, msg_type);
+        } catch (Exception e) {
+            BaseEntity entity = new BaseEntity();
+            entity.setErr_no(1);
+            entity.setErr_msg(e.getMessage());
+            return entity;
+        }
     }
 
     /**
      * 停止任务
      */
     @GetMapping("end")
-    public BaseEntity gameEnd(@RequestParam("roomid") String roomid, @RequestParam String msg_type){
-        return gameService.gameEnd(roomid, msg_type);
+    public BaseEntity gameEnd(@RequestParam("roomid") String roomid, @RequestParam String msg_type) {
+        try {
+            return gameService.gameEnd(roomid, msg_type);
+        } catch (Exception e) {
+            BaseEntity entity = new BaseEntity();
+            entity.setErr_no(1);
+            entity.setErr_msg(e.getMessage());
+            return entity;
+        }
     }
 
 
@@ -43,59 +58,63 @@ public class GameServiceController {
      * 查询任务状态
      */
     @GetMapping("task/status")
-    public BaseEntity checkTaskStatus(@RequestParam("roomid") String roomid, @RequestParam String msg_type){
+    public BaseEntity checkTaskStatus(@RequestParam("roomid") String roomid, @RequestParam String msg_type) {
         return gameService.checkTaskStatus(roomid, msg_type);
     }
 
 
     /**
      * 接收评论消息接口
+     *
      * @param headers
      * @param payLoad
      * @return
      */
-    @PostMapping("msgreceive/comment")
-    public String receivePushedMsgComment(@RequestHeader Map<String,String> headers, @RequestBody String payLoad){
+    @PostMapping("msg/comment")
+    public String receivePushedMsgComment(@RequestHeader Map<String, String> headers, @RequestBody String payLoad) {
         return gameService.receivePushedMsg(headers, payLoad, MsgTypeConstant.COMMENT);
     }
 
     /**
      * 接收点赞消息接口
+     *
      * @param headers
      * @param payLoad
      * @return
      */
-    @PostMapping("msgreceive/like")
-    public String receivePushedMsgLike(@RequestHeader Map<String,String> headers, @RequestBody String payLoad){
+    @PostMapping("msg/like")
+    public String receivePushedMsgLike(@RequestHeader Map<String, String> headers, @RequestBody String payLoad) {
         return gameService.receivePushedMsg(headers, payLoad, MsgTypeConstant.LIKE);
     }
 
     /**
      * 接收礼物消息接口
+     *
      * @param headers
      * @param payLoad
      * @return
      */
-    @PostMapping("msgreceive/gift")
-    public String receivePushedMsgGift(@RequestHeader Map<String,String> headers, @RequestBody String payLoad){
+    @PostMapping("msg/gift")
+    public String receivePushedMsgGift(@RequestHeader Map<String, String> headers, @RequestBody String payLoad) {
         return gameService.receivePushedMsg(headers, payLoad, MsgTypeConstant.GIFT);
     }
 
 
     /**
      * 手机获取消息接口
+     *
      * @param roomid
      * @return
      */
     @GetMapping("/msg")
-    public BaseEntity getMsg(@RequestParam("roomid") String roomid){
+    public BaseEntity getMsg(@RequestParam("roomid") String roomid) {
         return gameService.getMsg(roomid);
     }
 
 
     @GetMapping("/failMsg")
-    public BaseEntity failMsg(){
-        BaseEntity  entity  = new BaseEntity();
+    public BaseEntity failMsg() {
+        BaseEntity entity = new BaseEntity();
         entity.setErr_msg("0");
         entity.setErr_no(0);
         Map<String, Object> map = new HashMap<>();

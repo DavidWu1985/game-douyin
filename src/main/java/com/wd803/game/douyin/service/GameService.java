@@ -7,9 +7,9 @@ import java.util.Map;
 
 public interface GameService {
 
-    BaseEntity gameStart(String roomid, String msg_type);
+    BaseEntity gameStart(String roomid, String msg_type) throws Exception;
 
-    BaseEntity gameEnd(String roomid, String msg_type);
+    BaseEntity gameEnd(String roomid, String msg_type) throws Exception;
 
     BaseEntity checkTaskStatus(String roomid, String msg_type);
 
