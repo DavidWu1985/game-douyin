@@ -23,7 +23,7 @@ public class TokenServiceImpl implements TokenService {
 
     public final static String FORBID_KEY = "DOUYIN:TOKEN:FORBID:" + MsgTypeConstant.APP_ID;
 
-    public final static int FORBID_KEY_TTL = 60;
+    public final static int FORBID_KEY_TTL = 4;
 
     @Autowired
     private RedisTemplate redisTemplate;
