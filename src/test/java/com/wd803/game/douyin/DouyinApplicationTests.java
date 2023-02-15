@@ -17,7 +17,7 @@ import java.util.concurrent.Executors;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 class DouyinApplicationTests {
-
+//
 //    @Autowired
 //    private TokenService tokenService;
 //
@@ -26,6 +26,21 @@ class DouyinApplicationTests {
 //
 //    @Test
 //    void getToken() {
+//        ExecutorService executor = Executors.newCachedThreadPool();
+//
+//        for(int i = 0; i < 2; i++){
+//            executor.execute(new Runnable() {
+//                @Override
+//                public void run() {
+//                    tokenService.getToken();
+//                }
+//            });
+//        }
+//        try {
+//            Thread.sleep(10);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 //        System.out.println(tokenService.getToken());
 //    }
 //

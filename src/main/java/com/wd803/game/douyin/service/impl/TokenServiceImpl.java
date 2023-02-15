@@ -5,6 +5,9 @@ import com.wd803.game.douyin.entity.TokenEntity;
 import com.wd803.game.douyin.service.TokenService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.Redisson;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
@@ -23,16 +26,27 @@ public class TokenServiceImpl implements TokenService {
 
     public final static String FORBID_KEY = "DOUYIN:TOKEN:FORBID:" + MsgTypeConstant.APP_ID;
 
+    public final static String GET_TOKEN_LOCK = "DOUYIN:GETTOKEN:LOCK:" + MsgTypeConstant.APP_ID;
+
+    public final static String REFRESH_TOKEN_LOCK = "DOUYIN:REFRESHTOKEN:LOCK:" + MsgTypeConstant.APP_ID;
+
+    //禁止刷新token限制期
     public final static int FORBID_KEY_TTL = 4;
 
     @Autowired
     private RedisTemplate redisTemplate;
 
+    @Autowired
+    private RedissonClient redisson;
+
+
     @Override
-    public synchronized String getToken() {
-        //此处要加分布式锁
+    public String getToken() {
         String token = (String) redisTemplate.opsForValue().get(TOKEN_KEY);
-        if (StringUtils.isBlank(token)) {
+        if (StringUtils.isBlank("")) {
+            //此处要加分布式锁
+            RLock lock = redisson.getLock(GET_TOKEN_LOCK);
+            lock.lock(2, TimeUnit.SECONDS);
             RestTemplate rest = new RestTemplate();
             String url = "https://developer.toutiao.com/api/apps/v2/token";
             Map<String, String> map = new HashMap<>();
@@ -48,16 +62,20 @@ public class TokenServiceImpl implements TokenService {
             } else {
                 token = "";
             }
+            lock.unlock();
         }
         return token;
     }
 
 
     @Override
-    public synchronized void refreshToken() {
+    public void refreshToken() {
         log.info("token过期，刷新token");
         //禁止刷新时间区间
-        String forbidTimeSection = (String)redisTemplate.opsForValue().get(FORBID_KEY);
+        //此处要加分布式锁
+        RLock lock = redisson.getLock(REFRESH_TOKEN_LOCK);
+        lock.lock(1, TimeUnit.SECONDS);
+        String forbidTimeSection = (String) redisTemplate.opsForValue().get(FORBID_KEY);
         //在禁止刷新时间内
         if (StringUtils.isNotBlank(forbidTimeSection)) {
             log.info("在限制期内，不刷新token");
@@ -67,6 +85,7 @@ public class TokenServiceImpl implements TokenService {
             redisTemplate.opsForValue().set(FORBID_KEY, "forbid", FORBID_KEY_TTL, TimeUnit.SECONDS);
             redisTemplate.delete(TOKEN_KEY);
         }
+        lock.unlock();
     }
 
 }
