@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/gameservice/*")
+@RequestMapping("/wdgm/*")
 public class GameServiceController {
 
     @Autowired
