@@ -48,7 +48,27 @@ public class GameServiceImpl implements GameService {
         if (redisTemplate.opsForValue().get(MsgTypeConstant.TASK_REDIS_KEY + roomid) == null) {
             redisTemplate.opsForValue().set(MsgTypeConstant.TASK_REDIS_KEY + roomid, task);
         }
+        //top_gift
+        if(StringUtils.equals(msg_type, GIFT)){
+            topGift(roomid);
+        }
         return baseEntity;
+    }
+
+    private void topGift(String roomid){
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        String[] gifts = {"28rYzVFNyXEXFC8HI+f/WG+I7a6lfl3OyZZjUS+CVuwCgYZrPrUdytGHu0c=","fJs8HKQ0xlPRixn8JAUiL2gFRiLD9S6IFCFdvZODSnhyo9YN8q7xUuVVyZI=","PJ0FFeaDzXUreuUBZH6Hs+b56Jh0tQjrq0bIrrlZmv13GSAL9Q1hf59fjGk=",
+        "IkkadLfz7O/a5UR45p/OOCCG6ewAWVbsuzR/Z+v1v76CBU+mTG/wPjqdpfg=","gx7pmjQfhBaDOG2XkWI2peZ66YFWkCWRjZXpTqb23O/epru+sxWyTV/3Ufs=","pGLo7HKNk1i4djkicmJXf6iWEyd+pfPBjbsHmd3WcX0Ierm2UdnRR7UINvI="};
+        headers.add("x-token", tokenService.getToken());
+        headers.add("content-type", "application/json");
+        Map<String, Object> bodyMap = new HashMap<>();
+        bodyMap.put("room_id", roomid);
+        bodyMap.put("app_id", MsgTypeConstant.APP_ID);
+        bodyMap.put("sec_gift_id_list", gifts);
+        HttpEntity<String> requestEntity = new HttpEntity<>(JSONObject.toJSONString(bodyMap), headers);
+        ResponseEntity<BaseEntity> result = restTemplate.postForEntity("https://webcast.bytedance.com/api/gift/top_gift", requestEntity, BaseEntity.class);
+        log.info("礼物置顶结果：{}", result.getBody());
     }
 
     @Override
