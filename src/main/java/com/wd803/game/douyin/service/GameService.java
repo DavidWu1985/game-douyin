@@ -19,4 +19,5 @@ public interface GameService {
 
     void getFailMsgFromDouyin(TaskInfo task);
 
+    BaseEntity topGift(String roomid);
 }

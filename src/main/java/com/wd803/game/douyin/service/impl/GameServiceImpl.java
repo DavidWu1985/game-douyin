@@ -48,14 +48,14 @@ public class GameServiceImpl implements GameService {
         if (redisTemplate.opsForValue().get(MsgTypeConstant.TASK_REDIS_KEY + roomid) == null) {
             redisTemplate.opsForValue().set(MsgTypeConstant.TASK_REDIS_KEY + roomid, task);
         }
-        //top_gift
-        if(StringUtils.equals(msg_type, GIFT)){
-            topGift(roomid);
-        }
+//        //top_gift
+//        if(StringUtils.equals(msg_type, GIFT)){
+//            topGift(roomid);
+//        }
         return baseEntity;
     }
 
-    private void topGift(String roomid){
+    public BaseEntity topGift(String roomid){
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         String[] gifts = {"28rYzVFNyXEXFC8HI+f/WG+I7a6lfl3OyZZjUS+CVuwCgYZrPrUdytGHu0c=","fJs8HKQ0xlPRixn8JAUiL2gFRiLD9S6IFCFdvZODSnhyo9YN8q7xUuVVyZI=","PJ0FFeaDzXUreuUBZH6Hs+b56Jh0tQjrq0bIrrlZmv13GSAL9Q1hf59fjGk=",
@@ -69,6 +69,7 @@ public class GameServiceImpl implements GameService {
         HttpEntity<String> requestEntity = new HttpEntity<>(JSONObject.toJSONString(bodyMap), headers);
         ResponseEntity<BaseEntity> result = restTemplate.postForEntity("https://webcast.bytedance.com/api/gift/top_gift", requestEntity, BaseEntity.class);
         log.info("礼物置顶结果：{}", result.getBody());
+        return result.getBody();
     }
 
     @Override

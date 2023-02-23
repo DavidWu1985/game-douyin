@@ -40,6 +40,11 @@ public class GameServiceController {
         }
     }
 
+    @GetMapping("top_gift")
+    public BaseEntity topGift(@RequestParam("roomid") String roomid) {
+        return gameService.topGift(roomid);
+    }
+
     /**
      * 停止任务
      */
