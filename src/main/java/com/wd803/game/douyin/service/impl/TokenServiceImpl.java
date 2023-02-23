@@ -42,12 +42,11 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public String getToken() {
+        //此处要加分布式锁
         RLock lock = redisson.getLock(GET_TOKEN_LOCK);
         lock.lock(2, TimeUnit.SECONDS);
         String token = (String) redisTemplate.opsForValue().get(TOKEN_KEY);
-        if (StringUtils.isBlank("")) {
-            //此处要加分布式锁
-
+        if (StringUtils.isBlank(token)) {
             RestTemplate rest = new RestTemplate();
             String url = "https://developer.toutiao.com/api/apps/v2/token";
             Map<String, String> map = new HashMap<>();
