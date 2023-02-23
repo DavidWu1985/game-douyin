@@ -14,7 +14,7 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping("/wdgm/*")
+@RequestMapping("/gameservice/*")
 public class GameServiceController {
 
     @Autowired
