@@ -4,6 +4,7 @@ package com.wd803.game.douyin.controller;
 import com.wd803.game.douyin.entity.BaseEntity;
 import com.wd803.game.douyin.entity.MsgTypeConstant;
 import com.wd803.game.douyin.service.GameService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/wdgm/*")
 public class GameServiceController {
@@ -72,6 +74,8 @@ public class GameServiceController {
      */
     @PostMapping("msg/comment")
     public String receivePushedMsgComment(@RequestHeader Map<String, String> headers, @RequestBody String payLoad) {
+        log.info("POST comment headers: {}", headers);
+        log.info("POST comment MSG: {}", payLoad);
         return gameService.receivePushedMsg(headers, payLoad, MsgTypeConstant.COMMENT);
     }
 
@@ -84,6 +88,8 @@ public class GameServiceController {
      */
     @PostMapping("msg/like")
     public String receivePushedMsgLike(@RequestHeader Map<String, String> headers, @RequestBody String payLoad) {
+        log.info("POST like headers: {}", headers);
+        log.info("POST like MSG: {}", payLoad);
         return gameService.receivePushedMsg(headers, payLoad, MsgTypeConstant.LIKE);
     }
 
@@ -96,6 +102,8 @@ public class GameServiceController {
      */
     @PostMapping("msg/gift")
     public String receivePushedMsgGift(@RequestHeader Map<String, String> headers, @RequestBody String payLoad) {
+        log.info("POST gift headers: {}", headers);
+        log.info("POST gift MSG: {}", payLoad);
         return gameService.receivePushedMsg(headers, payLoad, MsgTypeConstant.GIFT);
     }
 

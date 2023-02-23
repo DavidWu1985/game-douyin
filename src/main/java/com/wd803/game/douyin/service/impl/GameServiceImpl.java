@@ -89,6 +89,7 @@ public class GameServiceImpl implements GameService {
             case MsgTypeConstant.GIFT:
                 signature = SignatureUtils.signature(map, payLoad, giftSecret);
         }
+        log.info("msg type is {}, signature is {}", msg_type, signature);
         //校验签名
         if (!StringUtils.equals(signature, headers.get("x-signature"))) {
             return null;
