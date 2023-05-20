@@ -5,6 +5,7 @@ import com.wd803.game.douyin.entity.BaseEntity;
 import com.wd803.game.douyin.entity.MsgTypeConstant;
 import com.wd803.game.douyin.service.GameService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +31,13 @@ public class GameServiceController {
      */
     @GetMapping("start")
     public BaseEntity gameStart(@RequestParam("roomid") String roomid, @RequestParam String msg_type) {
+        if(StringUtils.isBlank(roomid)){
+            BaseEntity entity = new BaseEntity();
+            entity.setErr_no(1);
+            entity.setErr_msg("缺少roomid参数");
+            log.info("游戏启动失败，缺少roomid参数");
+            return entity;
+        }
         try {
             return gameService.gameStart(roomid, msg_type);
         } catch (Exception e) {
