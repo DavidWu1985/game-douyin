@@ -25,7 +25,7 @@ public class GameServiceController {
     private RedisTemplate redisTemplate;
 
     /**
-     * 游戏启动
+     * start game
      *
      * @return
      */
@@ -54,7 +54,7 @@ public class GameServiceController {
     }
 
     /**
-     * 停止任务
+     * stop game
      */
     @GetMapping("end")
     public BaseEntity gameEnd(@RequestParam("roomid") String roomid, @RequestParam String msg_type) {
@@ -70,7 +70,7 @@ public class GameServiceController {
 
 
     /**
-     * 查询任务状态
+     * check task status
      */
     @GetMapping("task/status")
     public BaseEntity checkTaskStatus(@RequestParam("roomid") String roomid, @RequestParam String msg_type) {
@@ -79,8 +79,7 @@ public class GameServiceController {
 
 
     /**
-     * 接收评论消息接口
-     *
+     * get comment msg
      * @param headers
      * @param payLoad
      * @return
@@ -93,7 +92,7 @@ public class GameServiceController {
     }
 
     /**
-     * 接收点赞消息接口
+     * receive like msg
      *
      * @param headers
      * @param payLoad
@@ -107,7 +106,7 @@ public class GameServiceController {
     }
 
     /**
-     * 接收礼物消息接口
+     * receive gifts by this interface
      *
      * @param headers
      * @param payLoad
@@ -122,8 +121,7 @@ public class GameServiceController {
 
 
     /**
-     * 手机获取消息接口
-     *
+     * mobile phone get msg by this interface
      * @param roomid
      * @return
      */

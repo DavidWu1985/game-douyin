@@ -29,28 +29,28 @@ public class FailMsgTask {
     ExecutorService threadPool = Executors.newFixedThreadPool(3);
 
     /**
-     * 获取失败信息，每秒执行一次
+     * get failure msgs from douyin server,  Execute once per second
      */
     @Scheduled(fixedRate = 1000)
     public void getMsgFormDouyin() {
-        //查找要获取消息的房间号
+        //get game room Id
         List<String> taskeys = new ArrayList<>(redisTemplate.keys(MsgTypeConstant.TASK_REDIS_KEY + "*"));
         List<TaskInfo> taskInfos = redisTemplate.opsForValue().multiGet(taskeys);
         if (taskInfos != null){
             List<TaskInfo> unStarted = taskInfos.stream().filter(t -> {
                 return StringUtils.equals(t.getStarted(), "0");
             }).map(t -> {
-                //此处这么做，是避免任务重复多次启动，每次先修改任务状态再启动任务，避免时间延时
-                //修改状态，再加进去
+                //avoid multiple task starts
+                //update the status
                 t.setStarted("1");
                 redisTemplate.opsForValue().set(MsgTypeConstant.TASK_REDIS_KEY + t.getRoomid(), t);
                 return t;
             }).collect(Collectors.toList());
-            //启动
+            // run the job
             if (unStarted != null) {
                 unStarted.forEach(t -> {
                     System.out.println(t.getRoomid());
-                    //如果任务还没启动
+                    //check the job started
                     threadPool.execute(new TaskThread(gameService, t));
                 });
             }
